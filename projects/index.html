@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="Projects, experiments, and things built by Atlas.">
+  <meta name="description" content="Project notes and documentation by Atlas.">
   <title>Atlas - Projects</title>
   <link rel="stylesheet" href="../assets/css/styles.css">
   <script src="../assets/js/script.js" defer></script>
@@ -18,7 +18,6 @@
       </a>
       <nav class="site-nav" aria-label="Main navigation">
         <a href="../index.html">Home</a>
-        <a href="../blog/index.html">Blog</a>
         <a href="index.html" aria-current="page">Projects</a>
       </nav>
       <button class="theme-toggle" type="button" data-theme-toggle>Dark mode</button>
@@ -27,20 +26,32 @@
 
   <main class="page-shell" id="main">
     <section class="page-intro">
-      <p class="eyebrow">SELECTED WORK</p>
+      <p class="eyebrow">PROJECT DOCUMENTATION</p>
       <h1>Projects</h1>
-      <p>A closer look at what I build, how it works, and what I learned along the way.</p>
+      <p>Notes on the ideas, process, and tools behind each project.</p>
     </section>
-    <section class="content-section content-section-first" aria-label="Projects">
-      <h2 class="visually-hidden">All projects</h2>
-      <div class="card-grid" id="all-projects"></div>
+    <section class="project-list-section" aria-label="Projects">
+      <div class="project-list">
+        <a class="project-list-item" href="target-detection/index.html">
+          <span class="project-list-index" aria-hidden="true">01</span>
+          <span class="project-list-copy">
+            <span class="project-list-title">Target Detection</span>
+            <span class="project-list-summary">Object detection fundamentals, data preparation, annotation, training, and evaluation.</span>
+          </span>
+          <span class="project-list-status">In progress</span>
+          <span class="project-list-arrow" aria-hidden="true">&rarr;</span>
+        </a>
+      </div>
     </section>
   </main>
 
   <footer class="site-footer">
     <div class="footer-inner">
       <span>&copy; <span data-current-year></span> Atlas</span>
-      <span><a href="../index.html">Back home</a></span>
+      <nav class="footer-nav" aria-label="Footer navigation">
+        <a href="../index.html">Home</a>
+        <a href="index.html">Projects</a>
+      </nav>
     </div>
   </footer>
 </body>
