@@ -1,28 +1,46 @@
 ---
-description: Project overview and reading path for Target Detection.
+description: Object detection project overview.
+layout:
+  width: wide
+  description:
+    visible: false
+  tableOfContents:
+    visible: false
+  outline:
+    visible: false
+  pagination:
+    visible: false
 ---
 
 # Target Detection
 
-An in-progress project to understand and build an object-detection system. These pages document the ideas and workflow first, then can be extended with implementation details, experiments, and results as they become available.
+An in-progress guide to object detection and the steps involved in building a detector.
 
-## Project scope
+## Start here
 
-The project follows the full detection pipeline: define what should be detected, collect representative images, label objects, prepare datasets, train a model, and evaluate its behavior on new images.
-
-The target classes, dataset, model, and deployment environment are still to be decided. No model results or dataset measurements are assumed in these notes.
-
-## Reading path
-
-1. [Object detection fundamentals](object-detection.md) — what detection predicts and how it differs from classification.
-2. [End-to-end workflow](workflow.md) — the stages and outputs of a detection project.
-3. [Data collection](data-collection.md) — building a representative image dataset.
-4. [Annotation and labels](annotation.md) — defining consistent object boxes and classes.
-5. [Dataset preparation](dataset-preparation.md) — validating labels and creating reliable data splits.
-6. [Model training](training.md) — training choices, monitoring, and reproducibility.
-7. [Evaluation](evaluation.md) — metrics and error analysis.
-8. [Inference and iteration](inference-and-iteration.md) — applying the model and using failures to improve it.
-
-## Current status
-
-The project is at the learning and planning stage. The next implementation decisions are to define the target classes and use case, then select data sources and an annotation format.
+<table data-view="cards">
+  <thead>
+    <tr>
+      <th></th>
+      <th></th>
+      <th data-hidden data-card-target data-type="content-ref"></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><h4><i class="fa-eye">:eye:</i></h4></td>
+      <td><strong>Understand detection</strong><br>Classes, boxes, confidence, and the detector's output.</td>
+      <td><a href="object-detection.md">Object detection fundamentals</a></td>
+    </tr>
+    <tr>
+      <td><h4><i class="fa-images">:images:</i></h4></td>
+      <td><strong>Prepare the data</strong><br>Collect images, annotate objects, and validate dataset splits.</td>
+      <td><a href="workflow.md">End-to-end workflow</a></td>
+    </tr>
+    <tr>
+      <td><h4><i class="fa-chart-line">:chart-line:</i></h4></td>
+      <td><strong>Train and evaluate</strong><br>Train a model, measure its results, and inspect errors.</td>
+      <td><a href="training.md">Model training</a></td>
+    </tr>
+  </tbody>
+</table>

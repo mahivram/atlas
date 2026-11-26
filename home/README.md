@@ -1,6 +1,4 @@
 ---
-description: A central library for project documentation, concepts, and working notes.
-icon: house
 layout:
   width: wide
   tableOfContents:
@@ -11,19 +9,23 @@ layout:
     visible: false
 ---
 
-# Atlas Library
-
-A central place for project records, technical concepts, and working notes.
+# Mahiv's Library
 
 ## Recent work
 
-### Target Detection
-
-An in-progress study of object detection, from the underlying concepts through data preparation, annotation, training, and evaluation.
-
-[Open the Target Detection project](/projects/target-detection/)
-
-## Browse
-
-- [Projects](/projects/) — project-specific documentation and progress.
-- [Knowledge library](/library/) — notes and references that apply across projects.
+<table data-card-size="large" data-view="cards">
+  <thead>
+    <tr>
+      <th></th>
+      <th></th>
+      <th data-hidden data-card-target data-type="content-ref"></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><h4><i class="fa-crosshairs">:crosshairs:</i></h4></td>
+      <td><strong>Target Detection</strong><br>Object detection, from fundamentals to model evaluation.</td>
+      <td><a href="/projects/target-detection/">Target Detection</a></td>
+    </tr>
+  </tbody>
+</table>

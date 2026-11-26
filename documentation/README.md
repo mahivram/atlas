@@ -1,16 +1,23 @@
 ---
-description: Cross-project concepts, references, and reusable technical notes.
+description: Notes and references shared across projects.
 icon: book-open
 ---
 
 # Knowledge Library
 
-This space is for concepts, references, and notes that are useful across projects. Project-specific decisions and progress stay with their project documentation.
-
-## Current project knowledge
-
-The first set of notes is part of the [Target Detection project](/projects/target-detection/). It covers object-detection fundamentals and the complete workflow from collecting data to evaluating a model.
-
-## Organizing future notes
-
-Add a page here when it is reusable across projects. Keep implementation details, experiments, and project decisions in the relevant project space.
+<table data-card-size="large" data-view="cards">
+  <thead>
+    <tr>
+      <th></th>
+      <th></th>
+      <th data-hidden data-card-target data-type="content-ref"></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><h4><i class="fa-eye">:eye:</i></h4></td>
+      <td><strong>Object Detection Fundamentals</strong><br>Classes, bounding boxes, confidence, and model output.</td>
+      <td><a href="/projects/target-detection/object-detection/">Object Detection Fundamentals</a></td>
+    </tr>
+  </tbody>
+</table>

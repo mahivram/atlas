@@ -1,13 +1,22 @@
 ---
-description: Project documentation, methods, and progress.
+description: Active project documentation.
 ---
 
 # Projects
 
-This space contains project-specific documentation. Each project has its own overview, concepts, process notes, and working references.
-
-## Recent work
-
-### [Target Detection](target-detection/README.md)
-
-An in-progress study of object detection, covering the problem, data collection, annotation, training, and evaluation.
+<table data-card-size="large" data-view="cards">
+  <thead>
+    <tr>
+      <th></th>
+      <th></th>
+      <th data-hidden data-card-target data-type="content-ref"></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><h4><i class="fa-crosshairs">:crosshairs:</i></h4></td>
+      <td><strong>Target Detection</strong><br>Learn the object-detection workflow, from image data to evaluation.</td>
+      <td><a href="target-detection/README.md">Target Detection</a></td>
+    </tr>
+  </tbody>
+</table>

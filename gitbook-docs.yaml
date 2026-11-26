@@ -1,12 +1,11 @@
 $schema: https://api.gitbook.com/gitbook-docs.yaml
 site:
-  title: Atlas Library
+  title: "Mahiv's Library"
   structure:
     - type: section
       key: home
       title: Home
       path: home
-      icon: house
       default: true
       children:
         - type: space
