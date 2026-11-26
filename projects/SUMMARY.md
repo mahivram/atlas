@@ -4,7 +4,7 @@
 
 ## Target Detection
 
-* [Overview](target-detection/README.md)
+* [Overview](target-detection/target-detection.md)
 * [Object detection fundamentals](target-detection/object-detection.md)
 * [End-to-end workflow](target-detection/workflow.md)
 * [Data collection](target-detection/data-collection.md)
