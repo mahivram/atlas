@@ -13,6 +13,12 @@ import { sitePath } from '../../utils/paths';
 type Project = CollectionEntry<'projects'>;
 type ProjectSection = CollectionEntry<'projectSections'>;
 
+interface GuidePage {
+	slug: string;
+	title: string;
+	section?: ProjectSection;
+}
+
 export async function getStaticPaths() {
 	const [projects, projectSections] = await Promise.all([
 		getCollection('projects'),
@@ -25,16 +31,25 @@ export async function getStaticPaths() {
 			.filter((section) => section.id.startsWith(`${projectSlug}/sections/`))
 			.sort((a, b) => a.data.order - b.data.order);
 
-		return [
-			{
-				params: { slug: projectSlug },
-				props: { project, sections },
-			},
+		const guidePages: GuidePage[] = [
+			{ slug: projectSlug, title: 'Overview' },
 			...sections.map((section) => ({
-				params: { slug: `${projectSlug}/${section.id.split('/').at(-1)}` },
-				props: { project, sections, section },
+				slug: `${projectSlug}/${section.id.split('/').at(-1)}`,
+				title: section.data.title,
+				section,
 			})),
 		];
+
+		return guidePages.map((page, index) => ({
+			params: { slug: page.slug },
+			props: {
+				project,
+				sections,
+				section: page.section,
+				previous: guidePages[index - 1],
+				next: guidePages[index + 1],
+			},
+		}));
 	});
 }
 
@@ -42,9 +57,11 @@ interface Props {
 	project: Project;
 	sections: ProjectSection[];
 	section?: ProjectSection;
+	previous?: GuidePage;
+	next?: GuidePage;
 }
 
-const { project, sections, section } = Astro.props as Props;
+const { project, sections, section, previous, next } = Astro.props as Props;
 const projectSlug = project.id.split('/')[0];
 const currentSection = section?.id.split('/').at(-1) ?? 'overview';
 const contentEntry = section ?? project;
@@ -96,4 +113,82 @@ const pageTitle = section ? `${section.data.title} · ${project.data.title}` : p
 	<article class="prose">
 		<Content />
 	</article>
+	<nav class="project-pagination" aria-label="Project guide navigation">
+		{previous ? (
+			<a href={sitePath(`/projects/${previous.slug}/`)}>
+				<span>← Previous</span>
+				<strong>{previous.title}</strong>
+			</a>
+		) : (
+			<span class="pagination-edge" aria-disabled="true">
+				<span>← Previous</span>
+				<strong>Start of guide</strong>
+			</span>
+		)}
+		{next ? (
+			<a href={sitePath(`/projects/${next.slug}/`)}>
+				<span>Next →</span>
+				<strong>{next.title}</strong>
+			</a>
+		) : (
+			<span class="pagination-edge" aria-disabled="true">
+				<span>Next →</span>
+				<strong>End of guide</strong>
+			</span>
+		)}
+	</nav>
 </DocsLayout>
+
+<style>
+	.project-pagination {
+		display: grid;
+		grid-template-columns: repeat(2, minmax(0, 1fr));
+		gap: 0.75rem;
+		max-width: var(--reading-w);
+		margin-top: 2rem;
+	}
+
+	.project-pagination a,
+	.pagination-edge {
+		display: grid;
+		gap: 0.2rem;
+		min-height: 4.25rem;
+		padding: 0.7rem 0.8rem;
+		border: 1px solid var(--border);
+		border-radius: 6px;
+		text-decoration: none;
+	}
+
+	.project-pagination a:hover {
+		border-color: var(--text);
+	}
+
+	.project-pagination a:last-child,
+	.pagination-edge:last-child {
+		text-align: right;
+	}
+
+	.project-pagination span {
+		color: var(--muted-text);
+		font-size: 0.78rem;
+	}
+
+	.project-pagination strong {
+		font-size: 0.9rem;
+	}
+
+	.pagination-edge {
+		color: var(--muted-text);
+	}
+
+	@media (max-width: 520px) {
+		.project-pagination {
+			grid-template-columns: 1fr;
+		}
+
+		.project-pagination a:last-child,
+		.pagination-edge:last-child {
+			text-align: left;
+		}
+	}
+</style>

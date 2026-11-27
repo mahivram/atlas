@@ -16,7 +16,10 @@ order: 0
 
 Mahiv's Atlas is a static portfolio and documentation site built with Astro. Its content collections provide typed Markdown and MDX pages for projects and blog posts, while shared layouts keep navigation, themes, and reading pages consistent.
 
-The site favors a compact, text-first presentation: a centered reading column, clear headings, a project-specific guide sidebar, and a table of contents for long pages.
+The site favors a text-first presentation: shared responsive page containers, clear headings, a
+project-specific guide sidebar, and a table of contents for long pages. The guide is organized into
+two parts: concepts behind the site's architecture, then implementation from local setup through
+deployment.
 
 ## What this project demonstrates
 

@@ -1,16 +1,33 @@
 ---
 title: Content system
-description: Use content collections to keep projects and posts structured and type-checked.
+description: Understand content collections, schemas, and how structured Markdown becomes pages.
 group: Concepts
 order: 2
 ---
 
-## Collection structure
+## Content as structured data
 
-Astro's glob loader finds Markdown and MDX entries. Zod schemas validate required titles, descriptions, dates, tags, project status, and section order.
+The site separates its content from its page templates. Project descriptions, project guide sections,
+and blog posts live as Markdown or MDX files under `src/content/`. This keeps writing reviewable and
+editable without embedding every article in a component.
 
-Project index files describe the project as a whole. Separate section files carry a group name and order, which the project sidebar uses to build its navigation. Blog entries can be drafted without appearing in production lists, RSS, or the search index.
+## Collections and schemas
 
-## Shared layouts
+Astro content collections group related entries and validate their frontmatter. In
+`src/content.config.ts`, glob loaders discover Markdown and MDX files; Zod schemas check required
+fields such as titles, descriptions, dates, tags, status, and ordering. Validation catches missing or
+incorrect metadata while building rather than leaving malformed pages in production.
 
-The portfolio and list pages use a single reading column. Project and blog detail pages add navigation specific to their content, plus a table of contents generated from Markdown headings.
+The site has three collections:
+
+- **Projects** use `src/content/projects/<project>/index.md` for the project overview.
+- **Project sections** use files in that project's `sections/` directory. Their `group` and `order`
+  fields define the guide navigation.
+- **Blog posts** use Markdown or MDX files in `src/content/blog/`. Draft posts are filtered from
+  public listings and feeds.
+
+## Rendering and navigation
+
+Routes query collections with Astro's `getCollection()` and render entries with `render()`. Markdown
+headings provide stable anchors and the table of contents. The same section metadata drives both
+individual guide URLs and the left-hand sidebar, avoiding a separate hand-maintained navigation list.

@@ -14,20 +14,12 @@ interface Props {
 
 const { project, sections, currentSection } = Astro.props;
 const projectSlug = project.id.split('/')[0];
-const items = [
-	{
-		id: 'overview',
-		title: 'Overview',
-		group: project.data.group,
-		order: project.data.order,
-	},
-	...sections.map((section) => ({
-		id: section.id.split('/').at(-1) ?? section.id,
-		title: section.data.title,
-		group: section.data.group,
-		order: section.data.order,
-	})),
-];
+const items = sections.map((section) => ({
+	id: section.id.split('/').at(-1) ?? section.id,
+	title: section.data.title,
+	group: section.data.group,
+	order: section.data.order,
+}));
 const groups = new Map<string, typeof items>();
 for (const item of items) {
 	const group = groups.get(item.group) ?? [];
@@ -38,10 +30,7 @@ const orderedGroups = [...groups.entries()]
 	.map(([name, groupItems]) => [name, groupItems.sort((a, b) => a.order - b.order)] as const)
 	.sort((a, b) => a[1][0].order - b[1][0].order);
 
-const sectionHref = (sectionId: string) =>
-	sectionId === 'overview'
-		? sitePath(`/projects/${projectSlug}/`)
-		: sitePath(`/projects/${projectSlug}/${sectionId}/`);
+const sectionHref = (sectionId: string) => sitePath(`/projects/${projectSlug}/${sectionId}/`);
 ---
 
 <details class="sidebar-disclosure" data-mobile-sidebar open>
@@ -71,6 +60,13 @@ const sectionHref = (sectionId: string) =>
 			</div>
 		</header>
 		<nav aria-label={`${project.data.title} sections`}>
+			<a
+				class="sidebar-link sidebar-overview"
+				href={sitePath(`/projects/${projectSlug}/`)}
+				aria-current={currentSection === 'overview' ? 'page' : undefined}
+			>
+				Overview
+			</a>
 			{orderedGroups.map(([group, groupItems]) => (
 				<details class="sidebar-group" open>
 					<summary>{group}</summary>
@@ -162,6 +158,10 @@ const sectionHref = (sectionId: string) =>
 		color: var(--text);
 		font-size: 0.86rem;
 		text-decoration: none;
+	}
+
+	.sidebar-overview {
+		margin-bottom: 0.75rem;
 	}
 
 	.sidebar-link:hover {

@@ -1,25 +1,41 @@
 ---
 title: Local setup
 description: Install dependencies and run the portfolio locally.
-group: Getting started
-order: 1
+group: Implementation
+order: 5
 ---
 
-## Requirements
+## Requirements and installation
 
-Use Node.js `>=22.23.4` and npm. From the project directory:
+Use Node.js `>=22.23.4` and npm. Clone the repository, enter its root directory, and install the
+locked dependencies:
 
 ```sh
-npm install
+npm ci
+```
+
+`npm ci` installs the exact dependency versions recorded in `package-lock.json`. Use `npm install`
+when intentionally changing dependencies.
+
+## Run the development server
+
+Start Astro's local server:
+
+```sh
 npm run dev
 ```
 
-Astro prints the local URL when the development server starts. Build the static site with:
+Open the URL printed in the terminal, usually `http://localhost:4321`. The server rebuilds pages as
+you edit source files and content.
+
+## Check a production build
+
+Build and preview the generated static site:
 
 ```sh
 npm run build
+npm run preview
 ```
 
-## Local content workflow
-
-Add a project index under `src/content/projects/<project>/index.md`, sections under its `sections/` directory, and posts under `src/content/blog/`. Content frontmatter is checked against the schemas in `src/content.config.ts`.
+The production build also generates the Pagefind search index. Check page navigation, images, search,
+RSS, and links against this preview before deployment.
