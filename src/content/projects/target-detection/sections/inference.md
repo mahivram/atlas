@@ -1,8 +1,8 @@
 ---
 title: Run inference
 description: Start with still images, then inspect the live screen preview before any automation.
-group: Results
-order: 5
+group: Implementation
+order: 10
 ---
 
 ## Test saved images

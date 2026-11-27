@@ -1,8 +1,8 @@
 ---
 title: Train the model
 description: Run the training script and preserve the checkpoint and configuration for reproducibility.
-group: Concepts
-order: 3
+group: Implementation
+order: 8
 ---
 
 ## Start a training run

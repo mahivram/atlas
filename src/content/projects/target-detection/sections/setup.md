@@ -1,8 +1,8 @@
 ---
 title: Setup
 description: Create the Python environment and check the dataset paths before training.
-group: Getting started
-order: 1
+group: Implementation
+order: 6
 ---
 
 ## Requirements

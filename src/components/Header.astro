@@ -10,7 +10,10 @@ const isCurrent = (href: string) =>
 
 <header class="site-header" data-pagefind-ignore>
 	<div class="container nav-inner">
-		<a class="brand" href={sitePath('/')} aria-label={`${SITE_TITLE} home`}>{SITE_TITLE}</a>
+		<a class="brand" href={sitePath('/')} aria-label={`${SITE_TITLE} home`}>
+			<span class="brand-mark" aria-hidden="true">M</span>
+			<span class="brand-name">{SITE_TITLE.slice(1)}</span>
+		</a>
 		<button
 			class="mobile-menu-toggle"
 			type="button"
@@ -125,10 +128,23 @@ const isCurrent = (href: string) =>
 	}
 
 	.brand {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.2rem;
 		color: var(--text);
 		font-size: 1rem;
-		font-weight: 600;
+		font-weight: 400;
 		text-decoration: none;
+	}
+
+	.brand-mark {
+		color: var(--accent);
+		font-size: 2rem;
+		font-family: Georgia, 'Times New Roman', serif;
+		font-style: italic;
+		font-weight: 400;
+		letter-spacing: -0.08em;
+		line-height: 1;
 	}
 
 	.primary-nav {
@@ -149,6 +165,7 @@ const isCurrent = (href: string) =>
 		color: var(--text);
 		font-size: 0.9rem;
 		text-decoration: none;
+		transition: color 150ms ease;
 	}
 
 	.primary-nav a::after {
@@ -163,10 +180,11 @@ const isCurrent = (href: string) =>
 
 	.primary-nav a:hover::after,
 	.primary-nav a[aria-current='page']::after {
-		background: var(--text);
+		background: var(--accent);
 	}
 
 	.primary-nav a[aria-current='page'] {
+		color: var(--accent);
 		font-weight: 700;
 	}
 
@@ -289,6 +307,10 @@ const isCurrent = (href: string) =>
 
 		.primary-nav a::after {
 			display: none;
+		}
+
+		.primary-nav a[aria-current='page'] {
+			background: color-mix(in srgb, var(--accent) 10%, var(--background));
 		}
 
 		.header-actions {

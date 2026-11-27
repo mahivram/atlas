@@ -1,8 +1,8 @@
 ---
 title: Data collection and annotation
 description: Collect varied examples, annotate consistently, and preserve independent evaluation splits.
-group: Getting started
-order: 2
+group: Implementation
+order: 7
 ---
 
 ## Collect representative examples

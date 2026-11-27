@@ -1,13 +1,13 @@
 ---
-title: Evaluate before relying on predictions
-description: Combine held-out metrics with rendered examples and inspect different failure modes.
-group: Concepts
-order: 4
+title: Review evaluation results
+description: Inspect held-out results, rendered examples, and failure modes before using the model.
+group: Implementation
+order: 9
 ---
 
 import Callout from '../../../../components/Callout.astro';
 
-## Use each split for its intended purpose
+## Review held-out results
 
 Use validation data to compare runs and make training decisions. Reserve the test split for a final check. Review metric curves and rendered validation predictions together; look for missed objects, false alarms, loose boxes, and failures tied to scale or background.
 

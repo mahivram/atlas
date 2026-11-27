@@ -16,6 +16,7 @@ interface Props {
 
 const { title, description, toc = [] } = Astro.props;
 const hasSidebar = Astro.slots.has('sidebar');
+const hasRightSidebar = Astro.slots.has('right-sidebar');
 ---
 
 <BaseLayout title={title} description={description}>
@@ -23,7 +24,11 @@ const hasSidebar = Astro.slots.has('sidebar');
 		class:list={[
 			'container',
 			'docs-layout',
-			{ 'has-sidebar': hasSidebar, 'has-toc': toc.length > 0 },
+			{
+				'has-sidebar': hasSidebar,
+				'has-toc': toc.length > 0,
+				'has-right-sidebar': hasRightSidebar,
+			},
 		]}
 	>
 		{hasSidebar && (
@@ -31,22 +36,25 @@ const hasSidebar = Astro.slots.has('sidebar');
 				<slot name="sidebar" />
 			</aside>
 		)}
-		{toc.length > 0 && (
+		{(toc.length > 0 || hasRightSidebar) && (
 			<aside class="page-toc" data-pagefind-ignore>
-				<details data-toc-disclosure open>
-					<summary>On this page</summary>
-					<nav aria-label="On this page">
-						{toc.map((heading) => (
-							<a
-								class:list={['toc-link', { 'toc-link-nested': heading.depth > 2 }]}
-								href={`#${heading.slug}`}
-								data-toc-link
-							>
-								{heading.text}
-							</a>
-						))}
-					</nav>
-				</details>
+				{toc.length > 0 && (
+					<details data-toc-disclosure open>
+						<summary>On this page</summary>
+						<nav aria-label="On this page">
+							{toc.map((heading) => (
+								<a
+									class:list={['toc-link', { 'toc-link-nested': heading.depth > 2 }]}
+									href={`#${heading.slug}`}
+									data-toc-link
+								>
+									{heading.text}
+								</a>
+							))}
+						</nav>
+					</details>
+				)}
+				<slot name="right-sidebar" />
 			</aside>
 		)}
 		<main id="main" class="docs-main">
@@ -107,6 +115,11 @@ const hasSidebar = Astro.slots.has('sidebar');
 		const code = pre.querySelector('code');
 		if (!code) continue;
 
+		const codeBlock = document.createElement('div');
+		codeBlock.className = 'code-block';
+		pre.before(codeBlock);
+		codeBlock.append(pre);
+
 		const filename = pre.dataset.filename ?? pre.dataset.title;
 		if (filename) {
 			const label = document.createElement('div');
@@ -126,7 +139,7 @@ const hasSidebar = Astro.slots.has('sidebar');
 			checkIcon.setAttribute('hidden', '');
 			copyButton.append(checkIcon);
 		}
-		pre.append(copyButton);
+		codeBlock.append(copyButton);
 
 		copyButton.addEventListener('click', async () => {
 			try {
@@ -168,6 +181,13 @@ const hasSidebar = Astro.slots.has('sidebar');
 		display: grid;
 		grid-template-columns: var(--sidebar-w) minmax(0, 1fr);
 		grid-template-areas: 'left main';
+		column-gap: var(--col-gap);
+	}
+
+	.docs-layout:not(.has-sidebar).has-right-sidebar {
+		display: grid;
+		grid-template-columns: minmax(0, 1fr) var(--toc-w);
+		grid-template-areas: 'main toc';
 		column-gap: var(--col-gap);
 	}
 
@@ -231,8 +251,14 @@ const hasSidebar = Astro.slots.has('sidebar');
 		padding-left: 1.4rem;
 	}
 
-	:global(.docs-main pre) {
+	:global(.code-block) {
 		position: relative;
+		margin-block: 1rem;
+	}
+
+	:global(.docs-main pre) {
+		padding-right: 3rem;
+		margin: 0;
 	}
 
 	:global(.code-filename) {
@@ -292,6 +318,14 @@ const hasSidebar = Astro.slots.has('sidebar');
 	}
 
 	@media (max-width: 767px) {
+		.docs-layout:not(.has-sidebar).has-right-sidebar {
+			grid-template-columns: minmax(0, 1fr);
+			grid-template-areas:
+				'toc'
+				'main';
+			column-gap: 0;
+		}
+
 		.docs-layout.has-sidebar.has-toc,
 		.docs-layout.has-sidebar:not(.has-toc) {
 			display: grid;

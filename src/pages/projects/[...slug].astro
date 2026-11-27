@@ -140,6 +140,16 @@ const pageTitle = section ? `${section.data.title} · ${project.data.title}` : p
 </DocsLayout>
 
 <style>
+	.prose :global(h2) {
+		margin-bottom: 0.2rem;
+		font-weight: 600;
+	}
+
+	.prose :global(h3),
+	.prose :global(h4) {
+		font-weight: 400;
+	}
+
 	.project-pagination {
 		display: grid;
 		grid-template-columns: repeat(2, minmax(0, 1fr));

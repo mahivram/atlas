@@ -1,8 +1,8 @@
 ---
 title: Limits and responsible use
 description: Understand dataset limits and the behavior of optional mouse automation before running the tools.
-group: Results
-order: 6
+group: Implementation
+order: 11
 ---
 
 ## Limits of this model
