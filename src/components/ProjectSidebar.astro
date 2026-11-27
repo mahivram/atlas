@@ -1,0 +1,194 @@
+---
+import type { CollectionEntry } from 'astro:content';
+import Icon from './Icon.astro';
+import { sitePath } from '../utils/paths';
+
+type Project = CollectionEntry<'projects'>;
+type ProjectSection = CollectionEntry<'projectSections'>;
+
+interface Props {
+	project: Project;
+	sections: ProjectSection[];
+	currentSection: string;
+}
+
+const { project, sections, currentSection } = Astro.props;
+const projectSlug = project.id.split('/')[0];
+const items = [
+	{
+		id: 'overview',
+		title: 'Overview',
+		group: project.data.group,
+		order: project.data.order,
+	},
+	...sections.map((section) => ({
+		id: section.id.split('/').at(-1) ?? section.id,
+		title: section.data.title,
+		group: section.data.group,
+		order: section.data.order,
+	})),
+];
+const groups = new Map<string, typeof items>();
+for (const item of items) {
+	const group = groups.get(item.group) ?? [];
+	group.push(item);
+	groups.set(item.group, group);
+}
+const orderedGroups = [...groups.entries()]
+	.map(([name, groupItems]) => [name, groupItems.sort((a, b) => a.order - b.order)] as const)
+	.sort((a, b) => a[1][0].order - b[1][0].order);
+
+const sectionHref = (sectionId: string) =>
+	sectionId === 'overview'
+		? sitePath(`/projects/${projectSlug}/`)
+		: sitePath(`/projects/${projectSlug}/${sectionId}/`);
+---
+
+<details class="sidebar-disclosure" data-mobile-sidebar open>
+	<summary class="sidebar-menu-summary">
+		<Icon name="menu" />
+		Menu
+	</summary>
+	<div class="project-sidebar-content">
+		<header class="project-sidebar-heading">
+			<p class="eyebrow">Project</p>
+			<h2>{project.data.title}</h2>
+			<p>{project.data.description}</p>
+			<a class="sidebar-back" href={sitePath('/projects/')}>
+				<Icon name="arrow" /> All projects
+			</a>
+			<div class="sidebar-project-actions">
+				{project.data.repo && (
+					<a class="button-outline" href={project.data.repo} target="_blank" rel="noopener noreferrer">
+						<Icon name="github" /> Repository
+					</a>
+				)}
+				{project.data.demo && (
+					<a class="button-outline" href={project.data.demo} target="_blank" rel="noopener noreferrer">
+						<Icon name="externalLink" /> Live demo
+					</a>
+				)}
+			</div>
+		</header>
+		<nav aria-label={`${project.data.title} sections`}>
+			{orderedGroups.map(([group, groupItems]) => (
+				<details class="sidebar-group" open>
+					<summary>{group}</summary>
+					{groupItems.map((item) => (
+						<a
+							class="sidebar-link"
+							href={sectionHref(item.id)}
+							aria-current={currentSection === item.id ? 'page' : undefined}
+						>
+							{item.title}
+						</a>
+					))}
+				</details>
+			))}
+		</nav>
+	</div>
+</details>
+
+<style>
+	.sidebar-disclosure {
+		padding-block: 1.5rem;
+		border-right: 1px solid var(--border);
+	}
+
+	.sidebar-menu-summary {
+		display: none;
+	}
+
+	.project-sidebar-heading {
+		padding: 0 0 1rem;
+		margin-bottom: 0.75rem;
+		border-bottom: 1px solid var(--border);
+	}
+
+	.project-sidebar-heading h2 {
+		margin: 0 0 0.5rem;
+		font-size: 1.2rem;
+	}
+
+	.project-sidebar-heading > p:not(.eyebrow) {
+		color: var(--muted-text);
+		font-size: 0.88rem;
+		line-height: 1.5;
+	}
+
+	.sidebar-back {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.35rem;
+		font-size: 0.84rem;
+	}
+
+	.sidebar-back :global(svg),
+	.sidebar-project-actions :global(svg),
+	.sidebar-menu-summary :global(svg) {
+		width: 1rem;
+		height: 1rem;
+	}
+
+	.sidebar-project-actions {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.4rem;
+		margin-top: 0.75rem;
+	}
+
+	.sidebar-project-actions .button-outline {
+		min-height: 2rem;
+		padding: 0.25rem 0.45rem;
+		font-size: 0.78rem;
+	}
+
+	.sidebar-group {
+		margin: 0.5rem 0;
+	}
+
+	.sidebar-group summary {
+		padding: 0.35rem 0.4rem;
+		color: var(--muted-text);
+		font-size: 0.78rem;
+		font-weight: 700;
+		text-transform: uppercase;
+	}
+
+	.sidebar-link {
+		display: block;
+		padding: 0.35rem 0.55rem;
+		border-left: 2px solid transparent;
+		color: var(--text);
+		font-size: 0.86rem;
+		text-decoration: none;
+	}
+
+	.sidebar-link:hover {
+		text-decoration: underline;
+	}
+
+	.sidebar-link[aria-current='page'] {
+		border-left-color: var(--text);
+		font-weight: 700;
+	}
+
+	@media (max-width: 767px) {
+		.sidebar-disclosure {
+			padding-block: 0.75rem;
+			border-right: 0;
+			border-bottom: 1px solid var(--border);
+		}
+
+		.sidebar-menu-summary {
+			display: flex;
+			align-items: center;
+			gap: 0.5rem;
+			font-weight: 600;
+		}
+
+		.project-sidebar-content {
+			padding-top: 0.9rem;
+		}
+	}
+</style>

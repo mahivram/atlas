@@ -1,0 +1,99 @@
+---
+import { Image } from 'astro:assets';
+import {
+	type CollectionEntry,
+	getCollection,
+	render,
+} from 'astro:content';
+import ProjectSidebar from '../../components/ProjectSidebar.astro';
+import DocsLayout from '../../layouts/DocsLayout.astro';
+import TargetDetectionSample from '../../assets/target-detection-sample.png';
+import { sitePath } from '../../utils/paths';
+
+type Project = CollectionEntry<'projects'>;
+type ProjectSection = CollectionEntry<'projectSections'>;
+
+export async function getStaticPaths() {
+	const [projects, projectSections] = await Promise.all([
+		getCollection('projects'),
+		getCollection('projectSections'),
+	]);
+
+	return projects.flatMap((project) => {
+		const projectSlug = project.id.split('/')[0];
+		const sections = projectSections
+			.filter((section) => section.id.startsWith(`${projectSlug}/sections/`))
+			.sort((a, b) => a.data.order - b.data.order);
+
+		return [
+			{
+				params: { slug: projectSlug },
+				props: { project, sections },
+			},
+			...sections.map((section) => ({
+				params: { slug: `${projectSlug}/${section.id.split('/').at(-1)}` },
+				props: { project, sections, section },
+			})),
+		];
+	});
+}
+
+interface Props {
+	project: Project;
+	sections: ProjectSection[];
+	section?: ProjectSection;
+}
+
+const { project, sections, section } = Astro.props as Props;
+const projectSlug = project.id.split('/')[0];
+const currentSection = section?.id.split('/').at(-1) ?? 'overview';
+const contentEntry = section ?? project;
+const { Content, headings } = await render(contentEntry);
+const pageTitle = section ? `${section.data.title} · ${project.data.title}` : project.data.title;
+---
+
+<DocsLayout
+	title={pageTitle}
+	description={section?.data.description ?? project.data.description}
+	toc={headings}
+>
+	<ProjectSidebar
+		slot="sidebar"
+		project={project}
+		sections={sections}
+		currentSection={currentSection}
+	/>
+	{section ? (
+		<header class="page-heading">
+			<p class="eyebrow">
+				<a href={sitePath(`/projects/${projectSlug}/`)}>{project.data.title}</a>
+				<span aria-hidden="true"> / </span>
+				{section.data.group}
+			</p>
+			<h1>{section.data.title}</h1>
+			<p class="lead">{section.data.description}</p>
+		</header>
+	) : (
+		<header class="page-heading">
+			<p class="eyebrow">Project guide</p>
+			<h1>{project.data.title}</h1>
+			<p class="lead">{project.data.description}</p>
+			<ul class="tag-list">
+				{project.data.tags.map((tag) => <li>{tag}</li>)}
+			</ul>
+		</header>
+	)}
+	{!section && projectSlug === 'target-detection' && (
+		<figure class="project-sample">
+			<Image
+				src={TargetDetectionSample}
+				alt="Red target examples on the dark grid used for the current detection dataset."
+				width={1000}
+			/>
+			<figcaption>One of the visual patterns represented in the current dataset.</figcaption>
+		</figure>
+	)}
+	<article class="prose">
+		<Content />
+	</article>
+</DocsLayout>

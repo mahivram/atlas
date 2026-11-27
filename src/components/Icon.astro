@@ -1,0 +1,51 @@
+---
+import { Icon as AstroIcon } from 'astro-icon/components';
+
+const iconNames = {
+	overview: 'house',
+	projects: 'layout-grid',
+	blog: 'book-open',
+	about: 'circle-help',
+	target: 'crosshair',
+	arrow: 'arrow-right',
+	code: 'code-xml',
+	sun: 'sun',
+	moon: 'moon',
+	search: 'search',
+	menu: 'menu',
+	close: 'x',
+	github: 'github',
+	linkedin: 'linkedin',
+	mail: 'mail',
+	rss: 'rss',
+	externalLink: 'external-link',
+	info: 'info',
+	lightbulb: 'lightbulb',
+	warning: 'triangle-alert',
+	copy: 'copy',
+	check: 'check',
+	chevronLeft: 'chevron-left',
+	chevronRight: 'chevron-right',
+	chevronDown: 'chevron-down',
+	link: 'link',
+	clock: 'clock',
+	filter: 'list-filter',
+} as const;
+
+type IconName = keyof typeof iconNames;
+
+interface Props {
+	name: IconName;
+	class?: string;
+}
+
+const { name, class: className } = Astro.props;
+const classes = ['icon', className].filter(Boolean).join(' ');
+---
+
+<AstroIcon
+	name={`lucide:${iconNames[name]}`}
+	class={classes}
+	aria-hidden="true"
+	focusable="false"
+/>

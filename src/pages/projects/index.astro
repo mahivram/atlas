@@ -1,0 +1,32 @@
+---
+import { getCollection } from 'astro:content';
+import DocsLayout from '../../layouts/DocsLayout.astro';
+import { sitePath } from '../../utils/paths';
+
+const projects = await getCollection('projects');
+---
+
+<DocsLayout
+	title="Projects"
+	description="Browse documented projects, their technical foundations, setup steps, and practical guides."
+>
+	<header class="page-heading">
+		<h1>Projects</h1>
+		<p class="lead">
+			Each project page starts with the underlying ideas, then moves through the actual setup,
+			workflow, evaluation, and known limitations.
+		</p>
+	</header>
+	<section class="card-grid" aria-label="All projects">
+		{projects.map((project) => (
+			<a class="card" href={sitePath(`/projects/${project.id.split('/')[0]}/`)}>
+				<h2>{project.data.title}</h2>
+				<p>{project.data.description}</p>
+				<ul class="tag-list">
+					{project.data.tags.map((tag) => <li>{tag}</li>)}
+				</ul>
+				<span class="card-meta">Open project guide →</span>
+			</a>
+		))}
+	</section>
+</DocsLayout>

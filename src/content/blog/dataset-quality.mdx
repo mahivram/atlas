@@ -1,0 +1,39 @@
+---
+title: 'A small dataset can still teach useful lessons'
+description: 'How to collect representative images, keep labels consistent, and prevent data leakage.'
+pubDate: '2026-11-27'
+tags:
+  - Dataset
+  - Computer vision
+draft: false
+---
+
+import Callout from '../../components/Callout.astro';
+
+Dataset size is only one part of dataset quality. Ten genuinely different examples can reveal more than hundreds of near-identical frames, but a tiny dataset cannot establish that a model will work reliably outside those examples.
+
+## Collect for the conditions that matter
+
+Before collecting images, define the object and the setting where the model will be used. Then vary the factors that change its appearance: position, scale, background, lighting, occlusion, resolution, and the number of objects in a frame. Include empty scenes when false detections there would matter.
+
+For video or bursts of screenshots, adjacent frames are highly correlated. Keeping near-duplicates across training and test sets can make evaluation look much better than the model's real ability to generalize.
+
+## Make the annotation rules repeatable
+
+Decide how to label partly visible or ambiguous objects before annotating the full dataset. Keep class names and boundaries consistent, pair every image with the right label file, and inspect examples from each split. A clear policy helps distinguish model errors from labeling errors.
+
+## Keep evaluation independent
+
+Training data fits the model. Validation data helps compare choices. Test data is held back for a final check. Repeatedly adjusting a system based on test results turns the test set into part of development and weakens its independence.
+
+The current Target Detection export has 10 images split across 6 training, 3 validation, and 1 test image. That is a useful pipeline demonstration, but a one-image test set is far too small for a dependable metric. The next iteration should add varied examples and retain a genuinely separate test split.
+
+```yaml
+train: 6 images
+validation: 3 images
+test: 1 image
+```
+
+<Callout type="warning">
+	A small test set can illustrate evaluation, but it cannot support a reliable claim about generalization.
+</Callout>

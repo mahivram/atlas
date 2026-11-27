@@ -1,0 +1,112 @@
+---
+import { type CollectionEntry, getCollection, render } from 'astro:content';
+import BlogSidebar from '../../components/BlogSidebar.astro';
+import FormattedDate from '../../components/FormattedDate.astro';
+import DocsLayout from '../../layouts/DocsLayout.astro';
+import { readingTime, tagSlug } from '../../utils/blog';
+import { sitePath } from '../../utils/paths';
+
+type Post = CollectionEntry<'blog'>;
+
+export async function getStaticPaths() {
+	const posts = await getCollection('blog', ({ data }) => !data.draft);
+	return posts.map((post) => ({
+		params: { slug: post.id },
+		props: { post },
+	}));
+}
+
+interface Props {
+	post: Post;
+}
+
+const { post } = Astro.props as Props;
+const posts = (await getCollection('blog', ({ data }) => !data.draft)).sort(
+	(a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf(),
+);
+const postIndex = posts.findIndex((entry) => entry.id === post.id);
+const newerPost = posts[postIndex - 1];
+const olderPost = posts[postIndex + 1];
+const { Content, headings } = await render(post);
+---
+
+<DocsLayout title={post.data.title} description={post.data.description} toc={headings}>
+	<BlogSidebar slot="sidebar" posts={posts} currentSlug={post.id} />
+	<article class="prose">
+		<header class="page-heading">
+			<p class="eyebrow">
+				Blog · <FormattedDate date={post.data.pubDate} /> · {readingTime(post.body)}
+			</p>
+			<h1>{post.data.title}</h1>
+			<p class="lead">{post.data.description}</p>
+			{post.data.updatedDate && (
+				<p class="card-meta">Updated <FormattedDate date={post.data.updatedDate} /></p>
+			)}
+			{post.data.tags.length > 0 && (
+				<ul class="tag-list" aria-label="Article tags">
+					{post.data.tags.map((tag) => (
+						<li><a href={sitePath(`/blog/tags/${tagSlug(tag)}/`)}>{tag}</a></li>
+					))}
+				</ul>
+			)}
+		</header>
+		<Content />
+		<nav class="post-navigation" aria-label="More blog posts">
+			{newerPost && (
+				<a href={sitePath(`/blog/${newerPost.id}/`)}>
+					<span>Newer post</span>
+					<strong>{newerPost.data.title}</strong>
+				</a>
+			)}
+			{olderPost && (
+				<a href={sitePath(`/blog/${olderPost.id}/`)}>
+					<span>Older post</span>
+					<strong>{olderPost.data.title}</strong>
+				</a>
+			)}
+		</nav>
+	</article>
+</DocsLayout>
+
+<style>
+	.post-navigation {
+		display: grid;
+		grid-template-columns: repeat(2, minmax(0, 1fr));
+		gap: 0.75rem;
+		padding-top: 1.25rem;
+		margin-top: 2rem;
+		border-top: 1px solid var(--border);
+	}
+
+	.post-navigation a {
+		display: grid;
+		gap: 0.2rem;
+		padding: 0.75rem;
+		border: 1px solid var(--border);
+		border-radius: 6px;
+		text-decoration: none;
+	}
+
+	.post-navigation a:last-child {
+		text-align: right;
+	}
+
+	.post-navigation span {
+		color: var(--muted-text);
+		font-size: 0.78rem;
+	}
+
+	.post-navigation strong {
+		font-size: 0.9rem;
+	}
+
+	@media (max-width: 520px) {
+		.post-navigation {
+			grid-template-columns: 1fr;
+		}
+
+		.post-navigation a:last-child {
+			text-align: left;
+		}
+	}
+</style>

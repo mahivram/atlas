@@ -1,0 +1,15 @@
+---
+---
+
+<pagefind-modal instance="atlas" reset-on-close data-pagefind-ignore></pagefind-modal>
+
+<script>
+	interface PagefindModalElement extends HTMLElement {
+		open: () => void;
+	}
+
+	const modal = document.querySelector<PagefindModalElement>('pagefind-modal[instance="atlas"]');
+	const trigger = document.querySelector<HTMLButtonElement>('[data-search-open]');
+
+	trigger?.addEventListener('click', () => modal?.open());
+</script>

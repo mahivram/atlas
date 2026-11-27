@@ -1,0 +1,123 @@
+---
+import type { CollectionEntry } from 'astro:content';
+import FormattedDate from './FormattedDate.astro';
+import Icon from './Icon.astro';
+import { sitePath } from '../utils/paths';
+
+type Post = CollectionEntry<'blog'>;
+
+interface Props {
+	posts: Post[];
+	currentSlug: string;
+}
+
+const { posts, currentSlug } = Astro.props;
+const groupedPosts = new Map<number, Post[]>();
+for (const post of posts) {
+	const year = post.data.pubDate.getFullYear();
+	const group = groupedPosts.get(year) ?? [];
+	group.push(post);
+	groupedPosts.set(year, group);
+}
+const years = [...groupedPosts.entries()].sort((a, b) => b[0] - a[0]);
+---
+
+<details class="sidebar-disclosure" data-mobile-sidebar open>
+	<summary class="sidebar-menu-summary">
+		<Icon name="menu" />
+		Menu
+	</summary>
+	<div class="blog-sidebar-content">
+		<h2>All posts</h2>
+		{years.map(([year, yearPosts]) => (
+			<details class="sidebar-group" open>
+				<summary>{year}</summary>
+				<nav aria-label={`Blog posts from ${year}`}>
+					{yearPosts.map((post) => (
+						<a
+							class="sidebar-post"
+							href={sitePath(`/blog/${post.id}/`)}
+							aria-current={currentSlug === post.id ? 'page' : undefined}
+						>
+							<span>{post.data.title}</span>
+							<span class="sidebar-date"><FormattedDate date={post.data.pubDate} /></span>
+						</a>
+					))}
+				</nav>
+			</details>
+		))}
+	</div>
+</details>
+
+<style>
+	.sidebar-disclosure {
+		padding-block: 1.5rem;
+		border-right: 1px solid var(--border);
+	}
+
+	.sidebar-menu-summary {
+		display: none;
+	}
+
+	.blog-sidebar-content h2 {
+		margin: 0.2rem 0 1rem;
+		font-size: 1.2rem;
+	}
+
+	.sidebar-group {
+		margin: 0.5rem 0;
+	}
+
+	.sidebar-group summary {
+		padding: 0.35rem 0.4rem;
+		color: var(--muted-text);
+		font-size: 0.8rem;
+		font-weight: 700;
+	}
+
+	.sidebar-post {
+		display: grid;
+		gap: 0.15rem;
+		padding: 0.45rem 0.55rem;
+		border-left: 2px solid transparent;
+		font-size: 0.83rem;
+		text-decoration: none;
+	}
+
+	.sidebar-date {
+		color: var(--muted-text);
+		font-size: 0.75rem;
+	}
+
+	.sidebar-post:hover {
+		text-decoration: underline;
+	}
+
+	.sidebar-post[aria-current='page'] {
+		border-left-color: var(--text);
+		font-weight: 700;
+	}
+
+	.sidebar-post[aria-current='page'] time {
+		font-weight: 400;
+	}
+
+	@media (max-width: 767px) {
+		.sidebar-disclosure {
+			padding-block: 0.75rem;
+			border-right: 0;
+			border-bottom: 1px solid var(--border);
+		}
+
+		.sidebar-menu-summary {
+			display: flex;
+			align-items: center;
+			gap: 0.5rem;
+			font-weight: 600;
+		}
+
+		.blog-sidebar-content {
+			padding-top: 0.9rem;
+		}
+	}
+</style>

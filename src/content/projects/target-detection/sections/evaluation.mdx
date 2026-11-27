@@ -1,0 +1,27 @@
+---
+title: Evaluate before relying on predictions
+description: Combine held-out metrics with rendered examples and inspect different failure modes.
+group: Concepts
+order: 4
+---
+
+import Callout from '../../../../components/Callout.astro';
+
+## Use each split for its intended purpose
+
+Use validation data to compare runs and make training decisions. Reserve the test split for a final check. Review metric curves and rendered validation predictions together; look for missed objects, false alarms, loose boxes, and failures tied to scale or background.
+
+Precision, recall, and mAP answer different questions. Report the dataset version, split, confidence threshold, and relevant metric settings with results.
+
+## Choose the next experiment
+
+- Missed small targets: collect and label more examples at that scale.
+- False detections: add representative confusing backgrounds and empty frames.
+- Loose or inconsistent boxes: review and correct annotation rules.
+- Strong training but weak validation: investigate overfitting, duplicates, and split mismatch.
+
+Change one major factor at a time and record the dataset version, checkpoint, settings, and observed errors.
+
+<Callout type="warning">
+	The current test split contains one image. Its metrics are too unstable to support a claim of dependable accuracy.
+</Callout>

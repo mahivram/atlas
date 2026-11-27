@@ -1,0 +1,344 @@
+---
+import Icon from '../components/Icon.astro';
+import BaseLayout from './BaseLayout.astro';
+
+interface Heading {
+	depth: number;
+	slug: string;
+	text: string;
+}
+
+interface Props {
+	title: string;
+	description: string;
+	toc?: Heading[];
+}
+
+const { title, description, toc = [] } = Astro.props;
+const hasSidebar = Astro.slots.has('sidebar');
+---
+
+<BaseLayout title={title} description={description}>
+	<div
+		class:list={[
+			'container',
+			'docs-layout',
+			{ 'has-sidebar': hasSidebar, 'has-toc': toc.length > 0 },
+		]}
+	>
+		{hasSidebar && (
+			<aside class="left-sidebar" data-pagefind-ignore>
+				<slot name="sidebar" />
+			</aside>
+		)}
+		{toc.length > 0 && (
+			<aside class="page-toc" data-pagefind-ignore>
+				<details data-toc-disclosure open>
+					<summary>On this page</summary>
+					<nav aria-label="On this page">
+						{toc.map((heading) => (
+							<a
+								class:list={['toc-link', { 'toc-link-nested': heading.depth > 2 }]}
+								href={`#${heading.slug}`}
+								data-toc-link
+							>
+								{heading.text}
+							</a>
+						))}
+					</nav>
+				</details>
+			</aside>
+		)}
+		<main id="main" class="docs-main">
+			<slot />
+		</main>
+	</div>
+	<template id="heading-link-icon"><Icon name="link" /></template>
+	<template id="copy-code-icon"><Icon name="copy" /></template>
+	<template id="copy-done-icon"><Icon name="check" /></template>
+</BaseLayout>
+
+<script>
+	const sidebarBreakpoint = window.matchMedia('(max-width: 767px)');
+	const tocBreakpoint = window.matchMedia('(max-width: 1100px)');
+	const sidebarDisclosures = document.querySelectorAll<HTMLDetailsElement>('[data-mobile-sidebar]');
+	const tocDisclosures = document.querySelectorAll<HTMLDetailsElement>('[data-toc-disclosure]');
+	const syncSidebar = () => sidebarDisclosures.forEach((details) => (details.open = !sidebarBreakpoint.matches));
+	const syncToc = () => tocDisclosures.forEach((details) => (details.open = !tocBreakpoint.matches));
+
+	syncSidebar();
+	syncToc();
+	sidebarBreakpoint.addEventListener('change', syncSidebar);
+	tocBreakpoint.addEventListener('change', syncToc);
+
+	const iconFromTemplate = (id: string) =>
+		document.querySelector<HTMLTemplateElement>(`#${id}`)?.content.firstElementChild?.cloneNode(true);
+
+	for (const heading of document.querySelectorAll<HTMLElement>('.docs-main h2[id], .docs-main h3[id]')) {
+		if (!heading.id || heading.querySelector('.heading-anchor')) continue;
+		const anchor = document.createElement('a');
+		anchor.className = 'heading-anchor';
+		anchor.href = `#${heading.id}`;
+		anchor.setAttribute('aria-label', `Link to ${heading.textContent?.trim() ?? 'section'}`);
+		const icon = iconFromTemplate('heading-link-icon');
+		if (icon) anchor.append(icon);
+		heading.append(anchor);
+	}
+
+	const tocLinks = [...document.querySelectorAll<HTMLAnchorElement>('[data-toc-link]')];
+	const headings = [...document.querySelectorAll<HTMLElement>('.docs-main h2[id], .docs-main h3[id]')];
+	if ('IntersectionObserver' in window && tocLinks.length && headings.length) {
+		const observer = new IntersectionObserver(
+			(entries) => {
+				const visible = entries.find((entry) => entry.isIntersecting);
+				if (!visible) return;
+				const activeHref = `#${(visible.target as HTMLElement).id}`;
+				for (const link of tocLinks) {
+					if (link.getAttribute('href') === activeHref) link.setAttribute('aria-current', 'location');
+					else link.removeAttribute('aria-current');
+				}
+			},
+			{ rootMargin: '-10% 0px -75% 0px' },
+		);
+		headings.forEach((heading) => observer.observe(heading));
+	}
+
+	for (const pre of document.querySelectorAll<HTMLElement>('.docs-main pre')) {
+		const code = pre.querySelector('code');
+		if (!code) continue;
+
+		const filename = pre.dataset.filename ?? pre.dataset.title;
+		if (filename) {
+			const label = document.createElement('div');
+			label.className = 'code-filename';
+			label.textContent = filename;
+			pre.prepend(label);
+		}
+
+		const copyButton = document.createElement('button');
+		copyButton.className = 'copy-button';
+		copyButton.type = 'button';
+		copyButton.setAttribute('aria-label', 'Copy code');
+		const copyIcon = iconFromTemplate('copy-code-icon');
+		const checkIcon = iconFromTemplate('copy-done-icon');
+		if (copyIcon) copyButton.append(copyIcon);
+		if (checkIcon) {
+			checkIcon.setAttribute('hidden', '');
+			copyButton.append(checkIcon);
+		}
+		pre.append(copyButton);
+
+		copyButton.addEventListener('click', async () => {
+			try {
+				await navigator.clipboard.writeText(code.innerText);
+				copyButton.setAttribute('aria-label', 'Code copied');
+				copyIcon?.setAttribute('hidden', '');
+				checkIcon?.removeAttribute('hidden');
+				window.setTimeout(() => {
+					copyButton.setAttribute('aria-label', 'Copy code');
+					copyIcon?.removeAttribute('hidden');
+					checkIcon?.setAttribute('hidden', '');
+				}, 1500);
+			} catch {
+				copyButton.setAttribute('aria-label', 'Could not copy code');
+			}
+		});
+	}
+</script>
+
+<style>
+	.docs-layout {
+		min-height: 0;
+		flex: 1;
+	}
+
+	.docs-layout:not(.has-sidebar) {
+		display: block;
+		padding-block: 2rem;
+	}
+
+	.docs-layout.has-sidebar.has-toc {
+		display: grid;
+		grid-template-columns: var(--sidebar-w) minmax(0, 1fr) var(--toc-w);
+		grid-template-areas: 'left main toc';
+		column-gap: var(--col-gap);
+	}
+
+	.docs-layout.has-sidebar:not(.has-toc) {
+		display: grid;
+		grid-template-columns: var(--sidebar-w) minmax(0, 1fr);
+		grid-template-areas: 'left main';
+		column-gap: var(--col-gap);
+	}
+
+	.left-sidebar {
+		grid-area: left;
+		position: sticky;
+		top: var(--nav-h);
+		align-self: start;
+		height: calc(100vh - var(--nav-h));
+		overflow-y: auto;
+	}
+
+	.docs-main {
+		grid-area: main;
+		min-width: 0;
+		padding-block: 1.5rem;
+	}
+
+	.page-toc {
+		grid-area: toc;
+		position: sticky;
+		top: var(--nav-h);
+		align-self: start;
+		height: calc(100vh - var(--nav-h));
+		overflow-y: auto;
+		padding-block: 1.5rem;
+		border-left: 1px solid var(--border);
+	}
+
+	.page-toc summary {
+		margin: 0 0 0.55rem 0.75rem;
+		font-size: 0.85rem;
+		font-weight: 700;
+	}
+
+	.page-toc nav {
+		display: grid;
+		gap: 0.1rem;
+	}
+
+	.toc-link {
+		padding: 0.22rem 0.55rem 0.22rem 0.75rem;
+		border-left: 2px solid transparent;
+		color: var(--muted-text);
+		font-size: 0.82rem;
+		text-decoration: none;
+	}
+
+	.toc-link:hover,
+	.toc-link[aria-current='location'] {
+		border-left-color: var(--text);
+		color: var(--text);
+		text-decoration-thickness: 2px;
+	}
+
+	.toc-link[aria-current='location'] {
+		font-weight: 700;
+	}
+
+	.toc-link-nested {
+		padding-left: 1.4rem;
+	}
+
+	:global(.docs-main pre) {
+		position: relative;
+	}
+
+	:global(.code-filename) {
+		padding-bottom: 0.5rem;
+		margin-bottom: 0.5rem;
+		border-bottom: 1px solid var(--border);
+		color: var(--muted-text);
+		font-size: 0.8rem;
+	}
+
+	:global(.copy-button) {
+		position: absolute;
+		top: 0.5rem;
+		right: 0.5rem;
+		display: grid;
+		width: 2rem;
+		height: 2rem;
+		place-items: center;
+		padding: 0;
+		border: 1px solid var(--strong-border);
+		border-radius: 6px;
+		background: var(--background);
+		color: var(--text);
+		cursor: pointer;
+	}
+
+	:global(.copy-button svg) {
+		width: 1rem;
+		height: 1rem;
+	}
+
+	:global(.copy-button [hidden]) {
+		display: none;
+	}
+
+	@media (min-width: 768px) and (max-width: 1100px) {
+		.docs-layout.has-sidebar.has-toc {
+			grid-template-columns: var(--sidebar-w) minmax(0, 1fr);
+			grid-template-areas:
+				'left toc'
+				'left main';
+		}
+
+		.docs-layout.has-sidebar:not(.has-toc) {
+			grid-template-columns: var(--sidebar-w) minmax(0, 1fr);
+			grid-template-areas: 'left main';
+		}
+
+		.page-toc {
+			position: static;
+			height: auto;
+			overflow: visible;
+			padding-block: 1rem 0;
+			border-left: 0;
+			border-bottom: 1px solid var(--border);
+		}
+	}
+
+	@media (max-width: 767px) {
+		.docs-layout.has-sidebar.has-toc,
+		.docs-layout.has-sidebar:not(.has-toc) {
+			display: grid;
+			grid-template-columns: minmax(0, 1fr);
+			column-gap: 0;
+		}
+
+		.docs-layout.has-sidebar.has-toc {
+			grid-template-areas:
+				'left'
+				'toc'
+				'main';
+		}
+
+		.docs-layout.has-sidebar:not(.has-toc) {
+			grid-template-areas:
+				'left'
+				'main';
+		}
+
+		.page-toc {
+			position: static;
+			height: auto;
+			overflow: visible;
+			padding-block: 0.75rem;
+			border: 0;
+			border-bottom: 1px solid var(--border);
+		}
+
+		.left-sidebar {
+			position: static;
+			height: auto;
+			overflow: visible;
+		}
+
+		.docs-main {
+			padding-block: 1.5rem;
+		}
+	}
+
+	@media print {
+		.docs-layout {
+			display: block;
+		}
+
+		.docs-main {
+			padding: 0;
+		}
+	}
+</style>

@@ -1,0 +1,49 @@
+---
+title: 'Object detection: a practical mental model'
+description: 'Understand the classes, boxes, confidence scores, and evaluation ideas behind a custom detector.'
+pubDate: '2026-11-27'
+tags:
+  - Object detection
+  - Computer vision
+draft: false
+---
+
+import Callout from '../../components/Callout.astro';
+
+An image classifier answers, “What is in this picture?” An object detector also answers, “Where is each instance?” That extra location prediction makes detection useful when an image contains multiple objects or when downstream software needs to act on a particular object.
+
+## A detection is more than a label
+
+A typical detection contains three pieces:
+
+- **Class:** the category the model believes it found.
+- **Bounding box:** the estimated rectangle around that object.
+- **Confidence score:** a ranking signal for how strongly the model supports the prediction.
+
+The score is not automatically a calibrated probability. A score of `0.8` should not be interpreted as “this prediction is correct 80% of the time” unless the model has been calibrated and evaluated for that interpretation.
+
+```python
+detection = {
+    "class": "Target-Detection",
+    "confidence": 0.8,
+    "box_xyxy": [120, 45, 188, 112],
+}
+```
+
+<Callout type="note">
+	The output format is a useful mental model; the exact prediction object depends on the library and task.
+</Callout>
+
+## Training teaches both what and where
+
+Labeled examples pair images with object annotations. During training, the detector learns visual features and adjusts its predictions to reduce both classification and localization errors. Starting from a pretrained model is a form of transfer learning: existing visual representations are adapted to the project's classes instead of learning everything from scratch.
+
+This is why label quality and variety matter as much as choosing a model. A detector cannot learn consistent boundaries from inconsistent boxes, and it cannot reliably handle visual conditions that are absent from its training examples.
+
+## Metrics describe different failures
+
+Precision summarizes how many predictions are correct; recall summarizes how many labeled objects were found. Mean Average Precision combines precision-recall behavior with box-overlap criteria. These measures are useful, but they depend on the dataset, split, confidence, and overlap settings.
+
+For the Target Detection project, there is only one held-out test image in the current dataset. Any score from that split is a weak signal, not proof of generalization. Inspect prediction images and expand the data before drawing conclusions.
+
+The project guide covers the complete workflow, including the actual dataset and setup: [Target Detection](../../projects/target-detection/).

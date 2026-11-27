@@ -1,0 +1,42 @@
+---
+title: 'Read the prediction, not only the score'
+description: 'A simple review loop for finding useful next steps after detector training.'
+pubDate: '2026-11-27'
+tags:
+  - Evaluation
+  - Object detection
+draft: false
+---
+
+import Callout from '../../components/Callout.astro';
+
+Training metrics compress many predictions into a few numbers. Those numbers help compare runs, but a rendered prediction often makes the failure understandable: a small target was missed, a background detail triggered a false alarm, or the box is consistently too loose.
+
+## Pair metrics with examples
+
+Review validation predictions alongside their labels. Look for:
+
+1. **Misses:** labeled objects with no corresponding prediction.
+2. **False alarms:** predictions where no labeled object exists.
+3. **Localization errors:** boxes that cut off or include too much of an object.
+4. **Condition-specific failures:** errors that cluster around a scale, background, or screen layout.
+
+Precision and recall help quantify different parts of this picture. mAP summarizes behavior across confidence and overlap criteria. None of these metrics can compensate for an unrepresentative evaluation split.
+
+```text
+misses → recall
+false alarms → precision
+box overlap → localization quality
+```
+
+<Callout type="tip">
+	Inspect examples from validation data while tuning. Keep the test split for a final check.
+</Callout>
+
+## Turn each failure into a data question
+
+If small objects are missed, collect more examples at that scale. If an ordinary background creates false detections, add representative negatives. If boxes disagree with one another, clarify the annotation rule before changing model settings.
+
+Keep the test set out of routine iteration. Use validation examples to guide changes, record the dataset version and settings for each run, and make one major change at a time. This makes improvements easier to explain and reproduce.
+
+The [Target Detection project guide](../../projects/target-detection/) documents the current model configuration, inference scripts, dataset limits, and responsible use of its optional mouse automation.

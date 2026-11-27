@@ -1,0 +1,25 @@
+---
+import Icon from './Icon.astro';
+
+type CalloutType = 'note' | 'tip' | 'warning';
+
+interface Props {
+	type: CalloutType;
+}
+
+const { type } = Astro.props;
+const callouts = {
+	note: { label: 'Note', icon: 'info' },
+	tip: { label: 'Tip', icon: 'lightbulb' },
+	warning: { label: 'Warning', icon: 'warning' },
+} as const;
+const callout = callouts[type];
+---
+
+<aside class="callout" aria-label={`${callout.label} callout`}>
+	<p class="callout-heading">
+		<Icon name={callout.icon} />
+		<strong>{callout.label}</strong>
+	</p>
+	<div class="callout-content"><slot /></div>
+</aside>

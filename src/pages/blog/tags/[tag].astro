@@ -1,0 +1,53 @@
+---
+import { getCollection } from 'astro:content';
+import BlogSidebar from '../../../components/BlogSidebar.astro';
+import FormattedDate from '../../../components/FormattedDate.astro';
+import DocsLayout from '../../../layouts/DocsLayout.astro';
+import { readingTime, tagSlug } from '../../../utils/blog';
+import { sitePath } from '../../../utils/paths';
+
+export async function getStaticPaths() {
+	const posts = await getCollection('blog', ({ data }) => !data.draft);
+	const tags = [...new Set(posts.flatMap((post) => post.data.tags))];
+	return tags.map((tag) => ({
+		params: { tag: tagSlug(tag) },
+		props: {
+			tag,
+			posts: posts
+				.filter((post) => post.data.tags.includes(tag))
+				.sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf()),
+		},
+	}));
+}
+
+const { tag, posts } = Astro.props;
+const allPosts = (await getCollection('blog', ({ data }) => !data.draft)).sort(
+	(a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf(),
+);
+---
+
+<DocsLayout
+	title={`${tag} · Blog`}
+	description={`Articles tagged ${tag} on Mahiv's Atlas.`}
+>
+	<BlogSidebar slot="sidebar" posts={allPosts} currentSlug="" />
+	<header class="page-heading">
+		<p class="eyebrow"><a href={sitePath('/blog/')}>Blog</a> · Topic</p>
+		<h1>{tag}</h1>
+		<p class="lead">{posts.length} {posts.length === 1 ? 'article' : 'articles'} on this topic.</p>
+	</header>
+	<section class="post-list" aria-label={`Posts tagged ${tag}`}>
+		{posts.map((post) => (
+			<a class="post-row" href={sitePath(`/blog/${post.id}/`)}>
+				<span class="post-row-copy">
+					<span class="card-meta"><FormattedDate date={post.data.pubDate} /></span>
+					<strong class="post-row-title">{post.data.title}</strong>
+					<span class="post-row-description">{post.data.description}</span>
+				</span>
+				<span class="post-row-meta">
+					<span>{readingTime(post.body)}</span>
+				</span>
+			</a>
+		))}
+	</section>
+</DocsLayout>

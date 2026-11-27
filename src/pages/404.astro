@@ -1,0 +1,23 @@
+---
+import DocsLayout from '../layouts/DocsLayout.astro';
+import { sitePath } from '../utils/paths';
+---
+
+<DocsLayout title="Page not found" description="The requested page could not be found.">
+	<section class="not-found">
+		<p class="eyebrow">404 · Not found</p>
+		<h1>This page is not here.</h1>
+		<p class="lead">The link may be out of date, or the page may have moved.</p>
+		<a class="button-outline" href={sitePath('/')}>Back to portfolio</a>
+	</section>
+</DocsLayout>
+
+<style>
+	.not-found {
+		padding: 2rem 0;
+	}
+
+	.not-found .button-outline {
+		margin-top: 0.6rem;
+	}
+</style>
